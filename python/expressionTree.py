@@ -1,9 +1,9 @@
 class Tree(object):
 
     def lexer(self,expression):
-        expression = expression.replace("(","( ")
-        expression = expression.replace(")"," )")
-        expressionToken = expression.split()        
+        expressionToken = expression.replace("(","( ")
+        expressionToken = expressionToken.replace(")"," )")
+        expressionToken = expressionToken.split()        
         return expressionToken
     
     
@@ -39,9 +39,12 @@ class Tree(object):
                 elif element == "(":
                     stack.append(element)
                 elif element == ")":
-                    while stack[-1] != "(": #verificamos se o topo da pilha contem "(" se não adicionamos os operadores à fila
-                        queue.append(stack.pop())
-                    stack.pop()        
+                    try:
+                        while stack[-1] != "(": #verificamos se o topo da pilha contem "(" se não adicionamos os operadores à fila
+                            queue.append(stack.pop())
+                        stack.pop()
+                    except:
+                        raise ValueError("Erro nos parenteses, verifica se para cada ')' há um '(' correspondente!")     
                 else:
                     raise ValueError(element,' é um valor inválido!')                                       
         while stack: #Se existirem operadores ainda na pilha, mova-os à fila
@@ -49,30 +52,37 @@ class Tree(object):
               
         return queue
 
-    def evalStep(self,rpn):
+    def evalStep(self,rpn,expression):
         operators = ["+","-","*","/"]
         stack = []
+        print(expression)
         while rpn:
             element = rpn.pop(0)
-            if element in operators:
+            if element in operators: #se houver um operador, fazemos a operacao deste com os dois operandos no topo da pilha
                 operand = stack.pop()
                 operand2 = stack.pop()
-                exec('result = '+"str("+operand+element+operand2+")", locals(), globals())
-                stack.append(result)
+                exec('result = '+"int("+operand2+element+operand+")", locals(), globals()) #salva na variável result a operacao
+                stack.append(str(result))
+                expression = self.toString(element,operand,operand2,str(result),expression)
+                print(expression)
             else:
                 stack.append(element)    
-        return stack.pop()
+
+    def toString(self,operator,operand,operand2,result,expression):
+        subExpression = operand2+" "+operator+" "+operand 
+        expression = expression.replace(subExpression, result) #substituimos o os dois operandos e a operacao pelo seu resultado
+        if "("+result+")" in expression: 
+            expression = expression.replace("("+result+")",result)#se existir apenas o resultado entre parenteses, retiramo-nos
+        return expression
+
 def main():
     expression = input()
     while expression:
-        postFixExpression = []
         tree = Tree()
         token = tree.lexer(expression)
         rpn = tree.paser(token)
-        print(tree.evalStep(rpn))
-        # tree.postFix(rpnTree,postFixExpression)
-        # print(postFixExpression)
-
+        tree.evalStep(rpn,expression)
+        print("\n")
         expression = input()
 
 if __name__ == "__main__":
