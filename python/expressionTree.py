@@ -1,7 +1,7 @@
 def lexer(expression):
-    expressionToken = expression.replace("(","( ")
-    expressionToken = expressionToken.replace(")"," )")
-    expressionToken = expressionToken.split()        
+    expressionToken = expression.replace("(","( ") #incluimos um espaco entre ( e numero
+    expressionToken = expressionToken.replace(")"," )")#incluimos um espaco entre num e )
+    expressionToken = expressionToken.split() #separmos os elementos da expressão por espaço
     return expressionToken
 
 
