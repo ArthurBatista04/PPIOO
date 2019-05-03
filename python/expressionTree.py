@@ -7,12 +7,25 @@ class node(object):
 
 def lexer(expression):
     #Adicionamos um espaco entre os caracters não numerais
+    cont = 0
+    specialCaracters = ["+","-","*","/","(",")"]
     expressionToken = expression.replace("("," ( ")
     expressionToken = expressionToken.replace(")"," ) ")
     expressionToken = expressionToken.replace("+"," + ")
     expressionToken = expressionToken.replace("*"," * ")
     expressionToken = expressionToken.replace("/"," / ")
+    expressionToken = expressionToken.replace("-"," - ")
     expressionToken = expressionToken.split() #separmos os elementos da expressão por espaço
+    while cont<len(expressionToken): #diferenciamos os numeros negativos das operações de subtração
+        if expressionToken[cont] == "-":
+            if cont!=0:
+                if expressionToken[cont+1].isdigit() and expressionToken[cont-1] in specialCaracters:
+                    expressionToken[cont+1] = "-"+expressionToken[cont+1] 
+                    del expressionToken[cont]
+            else:
+                expressionToken[cont+1] = "-"+expressionToken[cont+1]
+                del expressionToken[cont]        
+        cont+=1
     return expressionToken
 
 
@@ -52,7 +65,7 @@ def paser(token):
                 except:
                     raise ValueError("Erro nos parenteses, verifica se para cada ')' há um '(' correspondente!")     
             else:
-                raise ValueError(element,' é um valor inválido!')                                       
+                raise ValueError(element,' é um valor inválido!')                                                  
     while stack: #Se existirem operadores ainda na pilha, movam-nos à fila
         queue.append(stack.pop()) 
     root = createTree(queue)      
@@ -98,10 +111,42 @@ def resolveExpression(root):
     print(root.key)    
 
 def toString(root): #Chamada in-order, esquerda, raiz e direita
+    maiorPrecedencia = ["*","/"]
+    menorPrecedencia = ["+","-"]
     if root != None:
-        toString(root.left)
-        print(root.key, end = " ")
-        toString(root.right)
+        if root.key in maiorPrecedencia and root.left.key in menorPrecedencia and root.right.key in menorPrecedencia: #caso tenha um operador de multiplicacao ou divisao e seus ambos seus filhos são adicoes ou subitracao 
+            print("( ", end = "")
+            toString(root.left)
+            print(")", end = " ")
+            
+            print(root.key, end = " ")
+            
+            print("( ",end = "")
+            toString(root.right)
+            print(")",end = " ")
+
+        elif root.key in maiorPrecedencia and root.left.key in menorPrecedencia: #caso tenha um operador de mul ou div e seu filho esquerdo for uma operacao de add ou sub
+            print("( ", end = "")
+            toString(root.left)
+            print(")", end = " ")
+            
+            print(root.key, end = " ")
+            
+            toString(root.right) 
+            
+        elif root.key in maiorPrecedencia and root.right.key in menorPrecedencia: #caso tenha um operador de mul ou div e seu filho direito for uma operacao de add ou sub
+            toString(root.left)
+            
+            print(root.key, end = " ")
+            
+            print("( ",end = "")
+            toString(root.right)
+            print(")",end = " ")
+
+        else: #Nao há parenteses 
+            toString(root.left)
+            print(root.key, end = " ")
+            toString(root.right)
 
 def main():
     expression = input()
