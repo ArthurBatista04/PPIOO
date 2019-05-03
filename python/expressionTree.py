@@ -1,17 +1,24 @@
+class node(object):
+    def __init__(self,key):
+        self.key = key
+        self.right = None
+        self.left = None
+    
+
 def lexer(expression):
-    expressionToken = expression.replace("(","( ") #incluimos um espaco entre ( e numero
-    expressionToken = expressionToken.replace(")"," )")#incluimos um espaco entre num e )
+    expressionToken = expression.replace("("," ( ")
+    expressionToken = expressionToken.replace(")"," ) ")
+    expressionToken = expressionToken.replace("+"," + ")
+    expressionToken = expressionToken.replace("*"," * ")
+    expressionToken = expressionToken.replace("/"," / ")
     expressionToken = expressionToken.split() #separmos os elementos da expressão por espaço
     return expressionToken
 
 
 def greaterPrecedence(operator1,operator2,operators): #verifica se o operator1 tem maior precedência se comparado ao 2
-    if operator2 not in operators: #Verifica se o topo da pilha é uma operacao e nao "(" ou ")"
-        return False
-    elif operator2 == "/" or operator2 == "*": #Se o topo da fila contem operatores de de multiplicacao ou divisao, certamente terá maior precedência
-        return True
-    elif operator1 == "/" or operator1 == "*":   
-        return False    
+    if operator2 not in operators:return False #Verifica se o topo da pilha é uma operacao e nao "(" ou ")"
+    elif operator2 == "/" or operator2 == "*": return True #Se o topo da fila contem operatores de de multiplicacao ou divisao, certamente terá maior precedência
+    elif operator1 == "/" or operator1 == "*":return False    
     return True # Ambos os operadores têm mesma precedência
 
 
@@ -45,41 +52,63 @@ def paser(token):
                     raise ValueError("Erro nos parenteses, verifica se para cada ')' há um '(' correspondente!")     
             else:
                 raise ValueError(element,' é um valor inválido!')                                       
-    while stack: #Se existirem operadores ainda na pilha, mova-os à fila
+    while stack: #Se existirem operadores ainda na pilha, movam-nos à fila
         queue.append(stack.pop()) 
-            
-    return queue
+    root = createTree(queue)      
+    return root
 
-def evalStep(rpn,expression):
-    operators = ["+","-","*","/"]
+def createTree(rpn):
     stack = []
-    print(expression)
-    while rpn:
-        element = rpn.pop(0)
-        if element in operators: #se houver um operador, fazemos a operacao deste com os dois operandos no topo da pilha
-            operand = stack.pop()
-            operand2 = stack.pop()
-            exec('result = '+"int("+operand2+element+operand+")", locals(), globals()) #salva na variável result a operacao
-            stack.append(str(result))
-            expression = toString(element,operand,operand2,str(result),expression)
-            print(expression)
-        else:
-            stack.append(element)    
+    operators = ["+","-","*","/"]
+    for element in rpn:
+        newNode = node(element)
+        if element in operators:
+            newNode.right = stack.pop()
+            newNode.left = stack.pop()
+        stack.append(newNode)
+    return stack.pop()    
 
-def toString(operator,operand,operand2,result,expression):
-    subExpression = operand2+" "+operator+" "+operand 
-    expression = expression.replace(subExpression, result) #substituimos o os dois operandos e a operacao pelo seu resultado
-    if "("+result+")" in expression: 
-        expression = expression.replace("("+result+")",result)#se existir apenas o resultado entre parenteses, retiramo-nos
-    return expression
+def executeOperation(leftOperator,operation,rightOperator):
+    if operation == "+": return(str(int(int(leftOperator) + int(rightOperator))))
+    elif operation == "-": return(str(int(int(leftOperator) - int(rightOperator))))
+    elif operation == "/": return(str(int(int(leftOperator) / int(rightOperator))))
+    else: return(str(int(int(leftOperator) * int(rightOperator))))
+
+
+def evalStep(root):
+    operators = ["+","-","*","/"]
+    while root.key in operators:
+        leftKey = root.left.key
+        rightKey = root.right.key
+        if leftKey not in operators and rightKey not in operators:
+            root.key = executeOperation(leftKey,root.key,rightKey) 
+            root.left = None
+            root.right = None
+        elif leftKey in operators:
+            root = root.left
+        else:
+            root = root.right       
+
+def resolveExpression(root):
+    while root.right != None and root.right!= None:
+        toString(root)
+        print()
+        evalStep(root)
+    print(root.key)    
+
+def toString(root):
+    if root != None:
+        toString(root.left)
+        print(root.key, end = " ")
+        toString(root.right)
 
 def main():
     expression = input()
     while expression:
         token = lexer(expression)
-        rpn = paser(token)
-        evalStep(rpn,expression)
-        print("\n")
+        root = paser(token)
+        resolveExpression(root)
+        print()
         expression = input()
 
 if __name__ == "__main__":
