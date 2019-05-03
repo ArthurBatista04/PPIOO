@@ -6,6 +6,7 @@ class node(object):
     
 
 def lexer(expression):
+    #Adicionamos um espaco entre os caracters não numerais
     expressionToken = expression.replace("("," ( ")
     expressionToken = expressionToken.replace(")"," ) ")
     expressionToken = expressionToken.replace("+"," + ")
@@ -62,11 +63,11 @@ def createTree(rpn):
     operators = ["+","-","*","/"]
     for element in rpn:
         newNode = node(element)
-        if element in operators:
+        if element in operators: #Quando encontrar um operator, os dois elementos no topo da pilha são seus filhos
             newNode.right = stack.pop()
             newNode.left = stack.pop()
         stack.append(newNode)
-    return stack.pop()    
+    return stack.pop() #retorna a raiz da árvore
 
 def executeOperation(leftOperator,operation,rightOperator):
     if operation == "+": return(str(int(int(leftOperator) + int(rightOperator))))
@@ -77,26 +78,26 @@ def executeOperation(leftOperator,operation,rightOperator):
 
 def evalStep(root):
     operators = ["+","-","*","/"]
-    while root.key in operators:
+    while root.key in operators: 
         leftKey = root.left.key
         rightKey = root.right.key
-        if leftKey not in operators and rightKey not in operators:
-            root.key = executeOperation(leftKey,root.key,rightKey) 
+        if leftKey not in operators and rightKey not in operators: #encontramos um nó operador que tem dois numeros como filhos
+            root.key = executeOperation(leftKey,root.key,rightKey) #o novo valor do nó será o operação do operador com seus operandos
             root.left = None
             root.right = None
-        elif leftKey in operators:
+        elif leftKey in operators:#verificamos se o elemento da esquerda é um operador
             root = root.left
         else:
             root = root.right       
 
 def resolveExpression(root):
-    while root.right != None and root.right!= None:
+    while root.right != None and root.right!= None: #Enquanto a arvore toda não for resolvida
         toString(root)
         print()
         evalStep(root)
     print(root.key)    
 
-def toString(root):
+def toString(root): #Chamada in-order, esquerda, raiz e direita
     if root != None:
         toString(root.left)
         print(root.key, end = " ")
