@@ -33,7 +33,7 @@ def greaterPrecedence(operator1,operator2,operators): #verifica se o operator1 t
     if operator2 not in operators:return False #Verifica se o topo da pilha é uma operacao e nao "(" ou ")"
     elif operator2 == "/" or operator2 == "*": return True #Se o topo da fila contem operatores de de multiplicacao ou divisao, certamente terá maior precedência
     elif operator1 == "/" or operator1 == "*":return False    
-    return True # Ambos os operadores têm mesma precedência
+    return True #Ambos os operadores têm mesma precedência
 
 
 
@@ -104,7 +104,7 @@ def evalStep(root):
             root = root.right       
 
 def resolveExpression(root):
-    while root.right != None and root.right!= None: #Enquanto a arvore toda não for resolvida
+    while root.right != None and root.left != None: #Enquanto a arvore toda não for resolvida
         toString(root)
         print()
         evalStep(root)
