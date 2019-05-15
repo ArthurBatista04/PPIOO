@@ -114,21 +114,6 @@ fn parser(tokens: &mut VecDeque<String>) -> VecDeque<String> {
 	return queue;
 }
 
-<<<<<<< HEAD
-fn main() {
-		let mut expression: String = String::new();
-		let mut token: VecDeque<String> = VecDeque::new();
-
-		// let stdin = io::stdin();
-		// stdin.lock().read_line(&mut expression).expect("FOI");
-		
-		// while expression.len() > 0 && expression != "\n".to_string() { // enquanto tiver input
-		// 		expression = expression.trim().to_string(); // transformar input em string
-		// 		token = lexer(&expression); 
-		// 		let root = parser(&mut token); // raiz da ávore
-		// 		expression.clear();
-		// 		stdin.lock().read_line(&mut expression).expect("FOI");
-=======
 fn create_tree(rpn: &mut VecDeque<String>) -> node{
 	let mut stack: VecDeque<node> = VecDeque::new();
 	let operators = vec![String::from("*"),String::from("/"),String::from("+"),String::from("-")];
@@ -143,29 +128,41 @@ fn create_tree(rpn: &mut VecDeque<String>) -> node{
 		}
 		stack.push_back(newNode);
 	}
-	return stack.pop_back().unwrap()
+	stack.pop_back().unwrap()
 }
 
-fn to_string(root: &mut node){
-	// if root.left == None && root.right == None{
-	// 	print!("{} ", root.key);
-	// } 
-	// else if root.left != None{
-	// 	to_String(&mut root.left.unwrap());
-	// }
-	// else{
-	// 	to_String(&mut root.right.unwrap());
-	// }
+fn to_string(root: &node) {
+    match root {
+        node {
+            left: None,
+            right: None,
+            ..
+        } => {
+            print!("{} ", root.key);
+        }
+        node {
+            left: Some(left),
+            right: None,
+            ..
+        } => {
+            to_string(&left);
+        }
+        node {
+            right: Some(right), ..
+        } => {
+            to_string(&right);
+        }
+    }
 }
 
-fn eval_step(root: &mut node) {
-	let operators = vec![String::from("*"),String::from("/"),String::from("+"),String::from("-")];
-	let mut left_key: String;
-	let mut right_key: String;
-	while operators.contains(&root.key){
-		left_key = *root.left.unwrap().key.to_string();
-	}
-}
+// fn eval_step(root: &mut node) {
+// 	let operators = vec![String::from("*"),String::from("/"),String::from("+"),String::from("-")];
+// 	let mut left_key: String;
+// 	let mut right_key: String;
+// 	while operators.contains(&root.key){
+// 		left_key = *root.left.unwrap().key.to_string();
+// 	}
+// }
 
 fn main() {
 		let mut expression: String = String::new();
@@ -182,9 +179,8 @@ fn main() {
 				to_string(&mut root);
 				expression.clear();
 				stdin.lock().read_line(&mut expression).expect("FOI");
->>>>>>> b60dfae22aaeb9ca154b3ce67e50b7c4ac825c6f
 						
-		// }
+		 }
     
 }
 
