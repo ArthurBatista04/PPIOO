@@ -1,5 +1,6 @@
 use std::collections::VecDeque;
 use std::io::{self, BufRead};
+use std::convert::AsRef;
 
 #[derive(Debug,PartialEq)]
 struct node {
@@ -118,51 +119,121 @@ fn create_tree(rpn: &mut VecDeque<String>) -> node{
 	let mut stack: VecDeque<node> = VecDeque::new();
 	let operators = vec![String::from("*"),String::from("/"),String::from("+"),String::from("-")];
 	let mut element;
-	let mut newNode;
+	let mut newnode;
 	while ! rpn.is_empty(){
 		element = rpn.pop_front();
-		newNode = node {key : element.clone().unwrap(), left : None, right: None};
+		newnode = node {key : element.clone().unwrap(), left : None, right: None};
 		if operators.contains(&element.unwrap()){
-			newNode.left = Some(Box::new(stack.pop_back().unwrap()));
-			newNode.right = Some(Box::new(stack.pop_back().unwrap()));
+			newnode.right = Some(Box::new(stack.pop_back().unwrap()));
+			newnode.left = Some(Box::new(stack.pop_back().unwrap()));
 		}
-		stack.push_back(newNode);
+		stack.push_back(newnode);
 	}
 	stack.pop_back().unwrap()
 }
 
 fn to_string(root: &node) {
+	let maiorPrecedencia = vec![String::from("*"),String::from("/")];
+	let menorPrecedencia = vec![String::from("+"),String::from("-")];
     match root {
         node {
             left: None,
             right: None,
             ..
         } => {
+
             print!("{} ", root.key);
         }
         node {
             left: Some(left),
-            right: None,
+            right: Some(right),
             ..
         } => {
-            to_string(&left);
+			if maiorPrecedencia.contains(&root.key) && menorPrecedencia.contains(&Some(left).unwrap().key) && menorPrecedencia.contains(&Some(right).unwrap().key){
+				print!("(");
+				to_string(&left);
+				print!(")");
+				print!(" {} ", root.key);
+				print!("(");
+				to_string(&right);
+				print!(")");
+			} else if maiorPrecedencia.contains(&root.key) && menorPrecedencia.contains(&Some(left).unwrap().key){
+				print!("(");
+				to_string(&left);
+				print!(")");
+				print!(" {} ", root.key);
+				to_string(&right);
+			} else if maiorPrecedencia.contains(&root.key) && menorPrecedencia.contains(&Some(right).unwrap().key){
+				to_string(&left);
+				print!(" {} ", root.key);
+				print!("(");
+				to_string(&right);
+				print!(")");
+			} else {
+				to_string(&left);
+				print!(" {} ", root.key);
+				to_string(&right);
+			}
+			
         }
-        node {
-            right: Some(right), ..
-        } => {
-            to_string(&right);
-        }
+		_ => {}
     }
 }
 
-// fn eval_step(root: &mut node) {
-// 	let operators = vec![String::from("*"),String::from("/"),String::from("+"),String::from("-")];
-// 	let mut left_key: String;
-// 	let mut right_key: String;
-// 	while operators.contains(&root.key){
-// 		left_key = *root.left.unwrap().key.to_string();
-// 	}
-// }
+
+fn eval_step(root: &mut node) {
+	let operators = vec![String::from("*"),String::from("/"),String::from("+"),String::from("-")];
+	let mut left_key: &String;
+	let mut right_key: &String;
+	while operators.contains(&root.key){
+		match root {
+			node {
+				left: Some(left),
+				right: Some(right),
+				key,
+				..
+			} => {
+				left_key = &Some(left).unwrap().key;
+				right_key = &Some(right).unwrap().key;
+				if !operators.contains(&left_key) && !operators.contains(&right_key){
+					node { key:execute_operation(left_key.to_string(),right_key.to_string(),key.to_string()), left : None, right: None };
+				}else if operators.contains(&left_key){
+					node { key: left_key.to_string(), left : Some(left).unwrap().left, right: Some(left).unwrap().right };
+				}
+				else{
+				}
+			}
+			_ => {}
+		}
+
+	}
+}
+
+fn execute_operation(operator1:String,operator2:String,operation:String) -> String{
+	let result;
+	match operation.as_ref() {
+		"+" => {
+			result = operator1.parse::<u64>().unwrap() + operator2.parse::<u64>().unwrap();
+			result.to_string()
+		}
+		"-" => {
+			result = operator1.parse::<u64>().unwrap() - operator2.parse::<u64>().unwrap();
+			result.to_string()
+		}
+		"*" => {
+			result = operator1.parse::<u64>().unwrap() * operator2.parse::<u64>().unwrap();
+			result.to_string()
+		}
+		"/" => {
+			result = operator1.parse::<u64>().unwrap() / operator2.parse::<u64>().unwrap();
+			result.to_string()
+		}
+		_ => {
+			"Error".to_string()
+		}
+	}
+}
+
 
 fn main() {
 		let mut expression: String = String::new();
@@ -177,6 +248,7 @@ fn main() {
 				let mut rpn = parser(&mut token); // raiz da ávore
 				root = create_tree(&mut rpn);
 				to_string(&mut root);
+				println!();
 				expression.clear();
 				stdin.lock().read_line(&mut expression).expect("FOI");
 						
