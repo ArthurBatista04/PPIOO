@@ -37,7 +37,7 @@ def greaterPrecedence(operator1,operator2,operators): #verifica se o operator1 t
 
 
 
-def paser(token):
+def parser(token):
     queue = []
     stack = []
     operators = ["+","-","*","/"]
@@ -50,7 +50,7 @@ def paser(token):
             if element in operators: #verificamos se o elemento é um operador e se a pilha contem elementos
                 while stack:
                     topOfStack = stack[-1]
-                    if greaterPrecedence(element,topOfStack,operators):
+                    if greaterPrecedence(element,topOfStack,operators): #se o operador do topo da pilha tiver maior precedência
                         queue.append(stack.pop()) #adicionamos o operator com maior precedencia da pilha à fila
                     else:
                         break    
@@ -67,9 +67,8 @@ def paser(token):
             else:
                 raise ValueError(element,' é um valor inválido!')                                                  
     while stack: #Se existirem operadores ainda na pilha, movam-nos à fila
-        queue.append(stack.pop()) 
-    root = createTree(queue)      
-    return root
+        queue.append(stack.pop())          
+    return queue
 
 def createTree(rpn):
     stack = []
@@ -108,7 +107,7 @@ def resolveExpression(root):
         toString(root)
         print()
         evalStep(root)
-    print(root.key)    
+    return root.key    
 
 def toString(root): #Chamada in-order, esquerda, raiz e direita
     maiorPrecedencia = ["*","/"]
@@ -152,8 +151,9 @@ def main():
     expression = input()
     while expression:
         token = lexer(expression)
-        root = paser(token)
-        resolveExpression(root)
+        rpn = parser(token)
+        root = createTree(rpn)
+        print(resolveExpression(root)) #print o resultado da expressão
         print()
         expression = input()
 
