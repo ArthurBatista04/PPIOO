@@ -106,23 +106,21 @@ fn parser(tokens: &mut VecDeque<String>) -> VecDeque<String> {
 	return queue;
 }
 
-fn createTree()
-
 fn main() {
 		let mut expression: String = String::new();
 		let mut token: VecDeque<String> = VecDeque::new();
 
-		let stdin = io::stdin();
-		stdin.lock().read_line(&mut expression).expect("FOI");
+		// let stdin = io::stdin();
+		// stdin.lock().read_line(&mut expression).expect("FOI");
 		
-		while expression.len() > 0 && expression != "\n".to_string() { // enquanto tiver input
-				expression = expression.trim().to_string(); // transformar input em string
-				token = lexer(&expression); 
-				let root = parser(&mut token); // raiz da ávore
-				expression.clear();
-				stdin.lock().read_line(&mut expression).expect("FOI");
+		// while expression.len() > 0 && expression != "\n".to_string() { // enquanto tiver input
+		// 		expression = expression.trim().to_string(); // transformar input em string
+		// 		token = lexer(&expression); 
+		// 		let root = parser(&mut token); // raiz da ávore
+		// 		expression.clear();
+		// 		stdin.lock().read_line(&mut expression).expect("FOI");
 						
-		}
+		// }
     
 }
 
@@ -134,7 +132,7 @@ fn main() {
         assert_eq!(lexer(&String::from("(71     -    12)+41  *2")),vec!("(","71","-","12",")","+","41","*","2"));
     }
     // fn parser_test(){
-    //     assert_eq!(parser(&mut VecDeque["(","10","/","3","+","23",")","*","(","1","-","4",")"]), vec!["10", "3", "/", "23", "+", "1", "4", "-", "*"]);
+    //     assert_eq!(parser(&mut <VecDeque>("(","10","/","3","+","23",")","*","(","1","-","4",")"), vec!["10", "3", "/", "23", "+", "1", "4", "-", "*"]);
     //     assert_eq!(parser(["-714","*","4","+","(","4","+","1",")","/","21"]),vec!["-714", "4", "4", "1", "+", "*", "21", "/"]);
     //     assert_eq!(parser(["41","-","-12"]), vec!["41", "-12", "-"]);
     //     assert_eq!(parser(["(","71","-","12",")","+","41","*","2"]), vec!["71", "12", "-", "41", "2", "*", "+"]);
