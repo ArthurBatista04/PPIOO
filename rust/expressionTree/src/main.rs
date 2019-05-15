@@ -1,6 +1,14 @@
 use std::collections::VecDeque;
 use std::io::{self, BufRead};
 
+#[derive(Debug,PartialEq)]
+struct node {
+	key: String,
+	left : Option<Box<node>>,
+	right : Option<Box<node>>,
+}
+
+
 fn lexer(expression: &String) -> VecDeque<String>{
 	let mut expression_token: VecDeque<String> = VecDeque::new();
 	let mut aux: Vec<char> = Vec::new();
@@ -106,19 +114,57 @@ fn parser(tokens: &mut VecDeque<String>) -> VecDeque<String> {
 	return queue;
 }
 
-fn createTree()
+fn create_tree(rpn: &mut VecDeque<String>) -> node{
+	let mut stack: VecDeque<node> = VecDeque::new();
+	let operators = vec![String::from("*"),String::from("/"),String::from("+"),String::from("-")];
+	let mut element;
+	let mut newNode;
+	while ! rpn.is_empty(){
+		element = rpn.pop_front();
+		newNode = node {key : element.clone().unwrap(), left : None, right: None};
+		if operators.contains(&element.unwrap()){
+			newNode.left = Some(Box::new(stack.pop_back().unwrap()));
+			newNode.right = Some(Box::new(stack.pop_back().unwrap()));
+		}
+		stack.push_back(newNode);
+	}
+	return stack.pop_back().unwrap()
+}
+
+fn to_string(root: &mut node){
+	// if root.left == None && root.right == None{
+	// 	print!("{} ", root.key);
+	// } 
+	// else if root.left != None{
+	// 	to_String(&mut root.left.unwrap());
+	// }
+	// else{
+	// 	to_String(&mut root.right.unwrap());
+	// }
+}
+
+fn eval_step(root: &mut node) {
+	let operators = vec![String::from("*"),String::from("/"),String::from("+"),String::from("-")];
+	let mut left_key: String;
+	let mut right_key: String;
+	while operators.contains(&root.key){
+		left_key = *root.left.unwrap().key.to_string();
+	}
+}
 
 fn main() {
 		let mut expression: String = String::new();
 		let mut token: VecDeque<String> = VecDeque::new();
-
+		let mut root;
 		let stdin = io::stdin();
 		stdin.lock().read_line(&mut expression).expect("FOI");
 		
 		while expression.len() > 0 && expression != "\n".to_string() { // enquanto tiver input
 				expression = expression.trim().to_string(); // transformar input em string
 				token = lexer(&expression); 
-				let root = parser(&mut token); // raiz da ávore
+				let mut rpn = parser(&mut token); // raiz da ávore
+				root = create_tree(&mut rpn);
+				to_string(&mut root);
 				expression.clear();
 				stdin.lock().read_line(&mut expression).expect("FOI");
 						
