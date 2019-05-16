@@ -2,7 +2,7 @@ use std::collections::VecDeque;
 use std::io::{self, BufRead};
 use std::convert::AsRef;
 
-#[derive(Debug,PartialEq)]
+#[derive(Debug,PartialEq,Clone)]
 struct node {
 	key: String,
 	left : Option<Box<node>>,
@@ -182,10 +182,10 @@ fn to_string(root: &node) {
 
 
 fn eval_step(root: &mut node) {
-	let operators = vec![String::from("*"),String::from("/"),String::from("+"),String::from("-")];
+	let maiorPrecedencia = vec![String::from("*"),String::from("/")];
+	let menorPrecedencia = vec![String::from("+"),String::from("-")];
 	let mut left_key: &String;
 	let mut right_key: &String;
-	while operators.contains(&root.key){
 		match root {
 			node {
 				left: Some(left),
@@ -193,23 +193,33 @@ fn eval_step(root: &mut node) {
 				key,
 				..
 			} => {
-				left_key = &Some(left).unwrap().key;
-				right_key = &Some(right).unwrap().key;
-				if !operators.contains(&left_key) && !operators.contains(&right_key){
-					node { key:execute_operation(left_key.to_string(),right_key.to_string(),key.to_string()), left : None, right: None };
-				}else if operators.contains(&left_key){
-					node { key: left_key.to_string(), left : Some(left).unwrap().left, right: Some(left).unwrap().right };
-				}
-				else{
+				if left.key.parse::<u64>().is_ok() && right.key.parse::<u64>().is_ok(){
+					root.key = execute_operation(&mut left.key,&mut right.key, key.to_string());
+					root.left = None;
+					root.right = None;
+				} else if maiorPrecedencia.contains(&left.key){
+					eval_step(left);
+				} else {
+					eval_step(right);
 				}
 			}
-			_ => {}
+			_ => {
+				println!("pau");
+			}
 		}
+}
 
+fn resolve_expression(mut root: node){
+	let mut root_aux = root.clone();
+	while root_aux.right != None && root_aux.left != None {
+		to_string(&root_aux);
+		println!();
+		eval_step(&mut root_aux);
+		root_aux = root;
 	}
 }
 
-fn execute_operation(operator1:String,operator2:String,operation:String) -> String{
+fn execute_operation(operator1: &mut String,operator2: &mut String,operation: String) -> String{
 	let result;
 	match operation.as_ref() {
 		"+" => {
@@ -247,11 +257,9 @@ fn main() {
 				token = lexer(&expression); 
 				let mut rpn = parser(&mut token); // raiz da ávore
 				root = create_tree(&mut rpn);
-				to_string(&mut root);
-				println!();
+				resolve_expression(root);
 				expression.clear();
-				stdin.lock().read_line(&mut expression).expect("FOI");
-						
+				stdin.lock().read_line(&mut expression).expect("FOI");	
 		 }
     
 }
