@@ -193,30 +193,32 @@ fn eval_step(root: &mut node) {
 				key,
 				..
 			} => {
-				if left.key.parse::<u64>().is_ok() && right.key.parse::<u64>().is_ok(){
+				//print!("chave = {:?} \n esquerda = {:?} \n direita = {:?}",key,left,right);
+				if left.key.parse::<i64>().is_ok() && right.key.parse::<i64>().is_ok(){
+					//print!("{:?} {:?} {:?}",key,left,right);
 					root.key = execute_operation(&mut left.key,&mut right.key, key.to_string());
 					root.left = None;
 					root.right = None;
-				} else if maiorPrecedencia.contains(&left.key){
+				} else if maiorPrecedencia.contains(&left.key) || menorPrecedencia.contains(&left.key){
 					eval_step(left);
 				} else {
 					eval_step(right);
 				}
 			}
 			_ => {
-				println!("pau");
+				// panic!("{:?}",root);
 			}
 		}
 }
 
-fn resolve_expression(mut root: node){
-	let mut root_aux = root.clone();
-	while root_aux.right != None && root_aux.left != None {
-		to_string(&root_aux);
+fn resolve_expression( root: &mut node){
+	while root.right != None && root.left != None {
+		to_string(&root);
 		println!();
-		eval_step(&mut root_aux);
-		root_aux = root;
+		eval_step(root);
 	}
+	print!("{}",root.key);
+	println!();
 }
 
 fn execute_operation(operator1: &mut String,operator2: &mut String,operation: String) -> String{
@@ -257,8 +259,9 @@ fn main() {
 				token = lexer(&expression); 
 				let mut rpn = parser(&mut token); // raiz da ávore
 				root = create_tree(&mut rpn);
-				resolve_expression(root);
+				resolve_expression(&mut root);
 				expression.clear();
+				println!();
 				stdin.lock().read_line(&mut expression).expect("FOI");	
 		 }
     
@@ -272,8 +275,8 @@ fn main() {
         assert_eq!(lexer(&String::from("(71     -    12)+41  *2")),vec!("(","71","-","12",")","+","41","*","2"));
     }
     // fn parser_test(){
-    //     assert_eq!(parser(&mut <VecDeque>("(","10","/","3","+","23",")","*","(","1","-","4",")"), vec!["10", "3", "/", "23", "+", "1", "4", "-", "*"]);
-    //     assert_eq!(parser(["-714","*","4","+","(","4","+","1",")","/","21"]),vec!["-714", "4", "4", "1", "+", "*", "21", "/"]);
-    //     assert_eq!(parser(["41","-","-12"]), vec!["41", "-12", "-"]);
-    //     assert_eq!(parser(["(","71","-","12",")","+","41","*","2"]), vec!["71", "12", "-", "41", "2", "*", "+"]);
-    // }
+    //     assert_eq!(parser(&mut VecDeque::from(vec!["(","10","/","3","+","23",")","*","(","1","-","4",")"])), vec!["10", "3", "/", "23", "+", "1", "4", "-", "*"]);
+    // //     assert_eq!(parser(["-714","*","4","+","(","4","+","1",")","/","21"]),vec!["-714", "4", "4", "1", "+", "*", "21", "/"]);
+    // //     assert_eq!(parser(["41","-","-12"]), vec!["41", "-12", "-"]);
+    // //     assert_eq!(parser(["(","71","-","12",")","+","41","*","2"]), vec!["71", "12", "-", "41", "2", "*", "+"]);
+    //  }
