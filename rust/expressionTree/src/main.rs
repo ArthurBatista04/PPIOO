@@ -142,7 +142,7 @@ fn to_string(root: &node) {
             ..
         } => {
 
-            print!("{} ", root.key);
+            print!("{}", root.key);
         }
         node {
             left: Some(left),
