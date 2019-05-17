@@ -225,19 +225,19 @@ fn execute_operation(operator1: &mut String,operator2: &mut String,operation: St
 	let result;
 	match operation.as_ref() {
 		"+" => {
-			result = operator1.parse::<u64>().unwrap() + operator2.parse::<u64>().unwrap();
+			result = operator1.parse::<i64>().unwrap() + operator2.parse::<i64>().unwrap();
 			result.to_string()
 		}
 		"-" => {
-			result = operator1.parse::<u64>().unwrap() - operator2.parse::<u64>().unwrap();
+			result = operator1.parse::<i64>().unwrap() - operator2.parse::<i64>().unwrap();
 			result.to_string()
 		}
 		"*" => {
-			result = operator1.parse::<u64>().unwrap() * operator2.parse::<u64>().unwrap();
+			result = operator1.parse::<i64>().unwrap() * operator2.parse::<i64>().unwrap();
 			result.to_string()
 		}
 		"/" => {
-			result = operator1.parse::<u64>().unwrap() / operator2.parse::<u64>().unwrap();
+			result = operator1.parse::<i64>().unwrap() / operator2.parse::<i64>().unwrap();
 			result.to_string()
 		}
 		_ => {
