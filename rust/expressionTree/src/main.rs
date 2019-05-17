@@ -14,6 +14,7 @@ fn lexer(expression: &String) -> VecDeque<String>{
 	let mut expression_token: VecDeque<String> = VecDeque::new();
 	let mut aux: Vec<char> = Vec::new();
 	let special_characters = vec!['*','/','+','-','(',')'];
+	let special_characters_verificate = vec!['*','/','+','-','('];
 	let mut count = 0;
 
 	for element in expression.chars() { //retira os espaços da string expression separando cada elemento em uma posição do vetor
@@ -47,7 +48,7 @@ fn lexer(expression: &String) -> VecDeque<String>{
 		if num != "".to_string() { // se um número foi formado
 			expression_token.push_back(num);
 		}else{
-			if aux[count] == '-' && aux[count + 1].is_digit(10) && special_characters.contains(&aux[count-1]) { //tratamento dos números negativos
+			if aux[count] == '-' && aux[count + 1].is_digit(10) && special_characters_verificate.contains(&aux[count-1]) { //tratamento dos números negativos
 				let mut negative_number: String = "-".to_string();
 				count = count + 1;
 				while aux[count].is_digit(10) { // enquanto tiver alagrismos

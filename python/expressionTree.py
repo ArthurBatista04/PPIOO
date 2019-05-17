@@ -9,7 +9,7 @@ class node(object):
 def lexer(expression):
     #Adicionamos um espaco entre os caracters não numerais
     cont = 0
-    specialCaracters = ["+","-","*","/","(",")"]
+    specialCaracters = ["+","-","*","/","("]
     expressionToken = expression.replace("("," ( ")
     expressionToken = expressionToken.replace(")"," ) ")
     expressionToken = expressionToken.replace("+"," + ")
@@ -128,6 +128,7 @@ def main():
     while expression:
         token = lexer(expression)
         rpn = parser(token)
+        print(rpn)
         root = createTree(rpn)
         print(resolveExpression(root)) #print o resultado da expressão
         print()

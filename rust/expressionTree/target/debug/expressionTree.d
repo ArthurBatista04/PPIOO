@@ -1,1 +1,1 @@
-/home/sandro/Área\ de\ trabalho/Sandro/UEM/CC/CC2019/PPIOO/PPIOO/rust/expressionTree/target/debug/expressionTree: /home/sandro/Área\ de\ trabalho/Sandro/UEM/CC/CC2019/PPIOO/PPIOO/rust/expressionTree/src/main.rs
+/home/arthur/Desktop/PPIOO/rust/expressionTree/target/debug/expressionTree: /home/arthur/Desktop/PPIOO/rust/expressionTree/src/main.rs
