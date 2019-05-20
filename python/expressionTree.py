@@ -101,34 +101,31 @@ def evalStep(root):
             root = root.right       
 
 def resolveExpression(root):
-    result = ""
     while root.right != None and root.left != None: #Enquanto a arvore toda não for resolvida
-        print(toString(root,result))
+        print(toString(root))
         evalStep(root)
-        result = ""
     return root.key    
 
-def toString(root,result): #Chamada in-order, esquerda, raiz e direita
+def toString(root): #Chamada in-order, esquerda, raiz e direita
     maiorPrecedencia = ["*","/"]
     menorPrecedencia = ["+","-"]
     if root != None:
         if root.key in maiorPrecedencia and root.left.key in menorPrecedencia and root.right.key in menorPrecedencia: #caso tenha um operador de multiplicacao ou divisao e seus ambos seus filhos são adicoes ou subitracao 
-            return "(" + toString(root.left,result) + ")" + " " + root.key + " " +  "("+ toString(root.right,result) + ")"
+            return "(" + toString(root.left) + ")" + " " + root.key + " " +  "("+ toString(root.right) + ")"
         elif root.key in maiorPrecedencia and root.left.key in menorPrecedencia: #caso tenha um operador de mul ou div e seu filho esquerdo for uma operacao de add ou sub
-            return "(" +  toString(root.left,result) + ")" + " " + root.key + " " + toString(root.right,result)     
+            return "(" +  toString(root.left) + ")" + " " + root.key + " " + toString(root.right)     
         elif root.key in maiorPrecedencia and root.right.key in menorPrecedencia: #caso tenha um operador de mul ou div e seu filho direito for uma operacao de add ou sub
-            return toString(root.left,result) + " " + root.key + " " + "(" + toString(root.right,result) + ")" 
+            return toString(root.left) + " " + root.key + " " + "(" + toString(root.right) + ")" 
         elif root.key in operators: #Nao há parenteses & a raiz é um operador
-            return toString(root.left,result) + " " + root.key + " " + toString(root.right,result)
+            return toString(root.left) + " " + root.key + " " + toString(root.right)
         else: #Nao há parenteses & a raiz é um número
-            return toString(root.left,result) + root.key + toString(root.right,result)
+            return toString(root.left) + root.key + toString(root.right)
     return "" 
 def main():
     expression = input()
     while expression:
         token = lexer(expression)
         rpn = parser(token)
-        print(rpn)
         root = createTree(rpn)
         print(resolveExpression(root)) #print o resultado da expressão
         print()
