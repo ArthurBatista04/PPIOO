@@ -133,7 +133,7 @@ fn create_tree(rpn: &mut VecDeque<String>) -> node{
 	stack.pop_back().unwrap()
 }
 
-fn to_string(root: &node) {
+fn to_string(root: &node) -> String {
 	let maiorPrecedencia = vec![String::from("*"),String::from("/")];
 	let menorPrecedencia = vec![String::from("+"),String::from("-")];
     match root {
@@ -142,8 +142,8 @@ fn to_string(root: &node) {
             right: None,
             ..
         } => {
-
-            print!("{}", root.key);
+			return root.key;
+            // print!("{}", root.key);
         }
         node {
             left: Some(left),
@@ -151,29 +151,33 @@ fn to_string(root: &node) {
             ..
         } => {
 			if maiorPrecedencia.contains(&root.key) && menorPrecedencia.contains(&Some(left).unwrap().key) && menorPrecedencia.contains(&Some(right).unwrap().key){
-				print!("(");
-				to_string(&left);
-				print!(")");
-				print!(" {} ", root.key);
-				print!("(");
-				to_string(&right);
-				print!(")");
+				return concat!("(", to_string(&left), ")", root.key, "(", to_string(&right), ")");
+				// print!("(");
+				// to_string(&left);
+				// print!(")");
+				// print!(" {} ", root.key);
+				// print!("(");
+				// to_string(&right);
+				// print!(")");
 			} else if maiorPrecedencia.contains(&root.key) && menorPrecedencia.contains(&Some(left).unwrap().key){
-				print!("(");
-				to_string(&left);
-				print!(")");
-				print!(" {} ", root.key);
-				to_string(&right);
+				return concat!("(", to_string(&left), ")", root.key, to_string(&right));
+				// print!("(");
+				// to_string[[(&left);
+				// print!(")");
+				// print!(" {} ", root.key);
+				// to_string(&right);
 			} else if maiorPrecedencia.contains(&root.key) && menorPrecedencia.contains(&Some(right).unwrap().key){
-				to_string(&left);
-				print!(" {} ", root.key);
-				print!("(");
-				to_string(&right);
-				print!(")");
+				return concat!(to_string(&left), root.key, "(", to_string(&right), ")");
+				// to_string(&left);
+				// print!(" {} ", root.key);
+				// print!("(");
+				// to_string(&right);
+				// print!(")");
 			} else {
-				to_string(&left);
-				print!(" {} ", root.key);
-				to_string(&right);
+				return concat!(to_string(&left), root.key, to_string(&right));
+				// to_string(&left);
+				// print!(" {} ", root.key);
+				// to_string(&right);
 			}
 			
         }
@@ -207,6 +211,7 @@ fn eval_step(root: &mut node) {
 				}
 			}
 			_ => {
+				return "";
 				// panic!("{:?}",root);
 			}
 		}
@@ -214,7 +219,7 @@ fn eval_step(root: &mut node) {
 
 fn resolve_expression( root: &mut node){
 	while root.right != None && root.left != None {
-		to_string(&root);
+		print!("{}", to_string(&root));
 		println!();
 		eval_step(root);
 	}
