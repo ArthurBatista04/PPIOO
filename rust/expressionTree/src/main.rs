@@ -134,23 +134,22 @@ fn create_tree(rpn: &mut VecDeque<String>) -> node{
 }
 
 fn to_string(root: &node) {
-	let maiorPrecedencia = vec![String::from("*"),String::from("/")];
-	let menorPrecedencia = vec![String::from("+"),String::from("-")];
+	let maior_precedencia = vec![String::from("*"),String::from("/")];
+	let menor_precedencia = vec![String::from("+"),String::from("-")];
     match root {
         node {
             left: None,
             right: None,
             ..
         } => {
-
-            print!("{}", root.key);
+			print!("{}",root.key);
         }
         node {
             left: Some(left),
             right: Some(right),
             ..
         } => {
-			if maiorPrecedencia.contains(&root.key) && menorPrecedencia.contains(&Some(left).unwrap().key) && menorPrecedencia.contains(&Some(right).unwrap().key){
+			if maior_precedencia.contains(&root.key) && menor_precedencia.contains(&Some(left).unwrap().key) && menor_precedencia.contains(&Some(right).unwrap().key){
 				print!("(");
 				to_string(&left);
 				print!(")");
@@ -158,13 +157,13 @@ fn to_string(root: &node) {
 				print!("(");
 				to_string(&right);
 				print!(")");
-			} else if maiorPrecedencia.contains(&root.key) && menorPrecedencia.contains(&Some(left).unwrap().key){
+			} else if maior_precedencia.contains(&root.key) && menor_precedencia.contains(&Some(left).unwrap().key){
 				print!("(");
 				to_string(&left);
 				print!(")");
 				print!(" {} ", root.key);
 				to_string(&right);
-			} else if maiorPrecedencia.contains(&root.key) && menorPrecedencia.contains(&Some(right).unwrap().key){
+			} else if maior_precedencia.contains(&root.key) && menor_precedencia.contains(&Some(right).unwrap().key){
 				to_string(&left);
 				print!(" {} ", root.key);
 				print!("(");
@@ -183,10 +182,8 @@ fn to_string(root: &node) {
 
 
 fn eval_step(root: &mut node) {
-	let maiorPrecedencia = vec![String::from("*"),String::from("/")];
-	let menorPrecedencia = vec![String::from("+"),String::from("-")];
-	let mut left_key: &String;
-	let mut right_key: &String;
+	let maior_precedencia = vec![String::from("*"),String::from("/")];
+	let menor_precedencia = vec![String::from("+"),String::from("-")];
 		match root {
 			node {
 				left: Some(left),
@@ -194,21 +191,17 @@ fn eval_step(root: &mut node) {
 				key,
 				..
 			} => {
-				//print!("chave = {:?} \n esquerda = {:?} \n direita = {:?}",key,left,right);
 				if left.key.parse::<i64>().is_ok() && right.key.parse::<i64>().is_ok(){
-					//print!("{:?} {:?} {:?}",key,left,right);
 					root.key = execute_operation(&mut left.key,&mut right.key, key.to_string());
 					root.left = None;
 					root.right = None;
-				} else if maiorPrecedencia.contains(&left.key) || menorPrecedencia.contains(&left.key){
+				} else if maior_precedencia.contains(&left.key) || menor_precedencia.contains(&left.key){
 					eval_step(left);
 				} else {
 					eval_step(right);
 				}
 			}
-			_ => {
-				// panic!("{:?}",root);
-			}
+			_ => {}
 		}
 }
 
@@ -268,6 +261,14 @@ fn main() {
     
 }
 
+
+	fn to_s(vec_aux: Vec<&str>) -> Vec<String> {
+		let mut vec_ans: Vec<String> = vec![];
+		for i in vec_aux{
+			vec_ans.push(i.to_string());
+		}
+		vec_ans
+	}
     #[test]
     fn lexer_test() {
         assert_eq!(lexer(&String::from("(10 / 3 + 23) * (1 - 4)")), vec!["(","10","/","3","+","23",")","*","(","1","-","4",")"]);
@@ -275,9 +276,44 @@ fn main() {
         assert_eq!(lexer(&String::from("41--12")),vec!("41","-","-12"));
         assert_eq!(lexer(&String::from("(71     -    12)+41  *2")),vec!("(","71","-","12",")","+","41","*","2"));
     }
-    // fn parser_test(){
-    //     assert_eq!(parser(&mut VecDeque::from(vec!["(","10","/","3","+","23",")","*","(","1","-","4",")"])), vec!["10", "3", "/", "23", "+", "1", "4", "-", "*"]);
-    // //     assert_eq!(parser(["-714","*","4","+","(","4","+","1",")","/","21"]),vec!["-714", "4", "4", "1", "+", "*", "21", "/"]);
-    // //     assert_eq!(parser(["41","-","-12"]), vec!["41", "-12", "-"]);
-    // //     assert_eq!(parser(["(","71","-","12",")","+","41","*","2"]), vec!["71", "12", "-", "41", "2", "*", "+"]);
-    //  }
+	#[test]
+    fn parser_test(){
+		assert_eq!(parser(&mut VecDeque::from(to_s(vec!["(","10","/","3","+","23",")","*","(","1","-","4",")"]))),to_s(vec!["10", "3", "/", "23", "+", "1", "4", "-", "*"]));
+        assert_eq!(parser(&mut VecDeque::from(to_s(vec!["-714","*","4","+","(","4","+","1",")","/","21"]))),to_s(vec!["-714", "4", "*", "4", "1", "+", "21", "/","+"]));
+        assert_eq!(parser(&mut VecDeque::from(to_s(vec!["41","-","-12"]))), to_s(vec!["41", "-12", "-"]));
+        assert_eq!(parser(&mut VecDeque::from(to_s(vec!["(","71","-","12",")","+","41","*","2"]))), to_s(vec!["71", "12", "-", "41", "2", "*", "+"]));
+     }
+	 #[test]
+	 fn result_test(){
+		lexer(&String::from("(10 / 3 + 23) * (1 - 4)"));
+		let mut rpn = parser(&mut VecDeque::from(to_s(vec!["(","10","/","3","+","23",")","*","(","1","-","4",")"])));
+		let mut root = create_tree(&mut rpn);
+		while root.right != None && root.left != None {
+			eval_step(&mut root);
+		}
+		assert_eq!(root.key, "-78".to_string());
+
+		lexer(&String::from("-714*4+(4+1)/21"));
+		rpn = parser(&mut VecDeque::from(to_s(vec!["-714","*","4","+","(","4","+","1",")","/","21"])));
+		root = create_tree(&mut rpn);
+		while root.right != None && root.left != None {
+			eval_step(&mut root);
+		}
+		assert_eq!(root.key, "-2856".to_string());
+
+		lexer(&String::from("41--12"));
+		rpn = parser(&mut VecDeque::from(to_s(vec!["41","-","-12"])));
+		root = create_tree(&mut rpn);
+		while root.right != None && root.left != None {
+			eval_step(&mut root);
+		}
+		assert_eq!(root.key, "53".to_string());
+
+		lexer(&String::from("(71     -    12)+41  *2"));
+		rpn = parser(&mut VecDeque::from(to_s(vec!["(","71","-","12",")","+","41","*","2"])));
+		root = create_tree(&mut rpn);
+		while root.right != None && root.left != None {
+			eval_step(&mut root);
+		}
+		assert_eq!(root.key, "141".to_string());
+	 }
