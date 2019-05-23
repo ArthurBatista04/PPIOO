@@ -18,9 +18,8 @@ fn lexer(expression: &String) -> VecDeque<String>{
 	let special_characters_verificate = vec!['*','/','+','-','('];
 	let mut count = 0;
 
-	//retira os espaços da string de expressão,
-	//colocando cada elemento (números e caracteres especiais) em uma posição do vetor
-	for element in expression.chars() { 
+	//coloca cada elemento (números e caracteres especiais) em uma posição do vetor
+	for element in expression.chars() {
 		if element.is_digit(10) || special_characters.contains(&element) {
 			aux.push(element);    
 		}
@@ -45,7 +44,7 @@ fn lexer(expression: &String) -> VecDeque<String>{
 	//constrói o restante do vetor de tokens
 	while count < aux.len() { 
 		let mut num: String = "".to_string();
-		//forma os valores numéricos
+		//forma os valores numéricos positivos
 		while aux[count].is_digit(10) {
 			num.push(aux[count]);
 			count = count + 1;
@@ -53,7 +52,7 @@ fn lexer(expression: &String) -> VecDeque<String>{
 				break;
 			}
 		}
-		
+		//se um número foi formado, adiciona no vetor
 		if num != "".to_string() { 
 			expression_token.push_back(num);
 		}else{
@@ -123,14 +122,17 @@ fn parser(tokens: &mut VecDeque<String>) -> VecDeque<String> {
 					}
 				}
 				stack.push_back(element);
+		//coloca o '(' na pilha  
 		} else if element == '('.to_string() {
 				stack.push_back(element);
+		//se for um ')', adicionamos os operadores à fila até encontrar o '('
 		} else if element == ')'.to_string() { 
-				while stack[stack.len()-1] != '('.to_string(){ // enquanto o topo da pilha for diferente de "("  adicionamos os operadores à fila
+				while stack[stack.len()-1] != '('.to_string(){ 
 					queue.push_back(stack.pop_back().unwrap());
 				}
 				stack.pop_back();
-		} else { // se for um caracter inválido
+		// se for um caracter inválido
+		} else { 
 				panic!("Caracter inválido: {}", element);
 		}
 	}
@@ -141,23 +143,28 @@ fn parser(tokens: &mut VecDeque<String>) -> VecDeque<String> {
 	return queue;
 }
 
+//recebe a expressão em reverse polish notation e monta a arvore, retornando o nó raiz 
 fn create_tree(rpn: &mut VecDeque<String>) -> node{
 	let mut stack: VecDeque<node> = VecDeque::new();
 	let operators = vec![String::from("*"),String::from("/"),String::from("+"),String::from("-")];
 	let mut element;
 	let mut newnode;
+	//percorre o vetor com a rpn
 	while ! rpn.is_empty(){
 		element = rpn.pop_front();
 		newnode = node {key : element.clone().unwrap(), left : None, right: None};
+		//se for um operador, coloca ele e seus filhos na arvore
 		if operators.contains(&element.unwrap()){
 			newnode.right = Some(Box::new(stack.pop_back().unwrap()));
 			newnode.left = Some(Box::new(stack.pop_back().unwrap()));
 		}
 		stack.push_back(newnode);
 	}
+	//retorna o topo da pilha
 	stack.pop_back().unwrap()
 }
 
+//percorre recursivamente a arvore e imprime na tela a expressão
 fn to_string(root: &node) {
 	let maior_precedencia = vec![String::from("*"),String::from("/")];
 	let menor_precedencia = vec![String::from("+"),String::from("-")];
@@ -199,13 +206,12 @@ fn to_string(root: &node) {
 				print!(" {} ", root.key);
 				to_string(&right);
 			}
-			
         }
 		_ => {}
     }
 }
 
-
+//recebe a arvore e realiza uma operação 
 fn eval_step(root: &mut node) {
 	let maior_precedencia = vec![String::from("*"),String::from("/")];
 	let menor_precedencia = vec![String::from("+"),String::from("-")];
@@ -216,10 +222,12 @@ fn eval_step(root: &mut node) {
 				key,
 				..
 			} => {
+				//se os dois filhos forem números, ele realiza a operação 
 				if left.key.parse::<i64>().is_ok() && right.key.parse::<i64>().is_ok(){
 					root.key = execute_operation(&mut left.key,&mut right.key, key.to_string());
 					root.left = None;
 					root.right = None;
+				//caso contrário, ele verifica se o filho da esquerda é um operador, se for, ele chama a função recursivamente passando-o
 				} else if maior_precedencia.contains(&left.key) || menor_precedencia.contains(&left.key){
 					eval_step(left);
 				} else {
@@ -230,7 +238,9 @@ fn eval_step(root: &mut node) {
 		}
 }
 
+//recebe a raiz da arvore e resolve a expressão
 fn resolve_expression( root: &mut node){
+	//se o filho da esquerda e direita fore none, significa que todas as operações foram realizadas 
 	while root.right != None && root.left != None {
 		to_string(&root);
 		println!();
@@ -240,6 +250,7 @@ fn resolve_expression( root: &mut node){
 	println!();
 }
 
+//recebe o operador e os operandos e realiza a operação
 fn execute_operation(operator1: &mut String,operator2: &mut String,operation: String) -> String{
 	let result;
 	match operation.as_ref() {
@@ -260,28 +271,29 @@ fn execute_operation(operator1: &mut String,operator2: &mut String,operation: St
 			result.to_string()
 		}
 		_ => {
-			"Error".to_string()
+			panic!("Error".to_string());
 		}
 	}
 }
 
 
 fn main() {
-		let mut expression: String = String::new();
-		let mut token: VecDeque<String> = VecDeque::new();
-		let mut root;
+		let mut expression: String = String::new(); //expressão de entrada
+		let mut token: VecDeque<String> = VecDeque::new(); //vetor de tokens
+		let mut root; //raiz da arvore a ser construida
 		let stdin = io::stdin();
-		stdin.lock().read_line(&mut expression).expect("FOI");
+		stdin.lock().read_line(&mut expression).expect("Não foi possível ler a expressão.");
 		
+		//enquanto há expressões, realiza os passos para resolvê-las
 		while expression.len() > 0 && expression != "\n".to_string() { // enquanto tiver input
 				expression = expression.trim().to_string(); // transformar input em string
-				token = lexer(&expression); 
-				let mut rpn = parser(&mut token); // raiz da ávore
-				root = create_tree(&mut rpn);
-				resolve_expression(&mut root);
-				expression.clear();
+				token = lexer(&expression); //constroi os tokens
+				let mut rpn = parser(&mut token); //constroi a reverse polish notation
+				root = create_tree(&mut rpn); // raiz da ávore
+				resolve_expression(&mut root); //resolve a expressão
+				expression.clear(); //limpa a expressão para uma proxima entrada
 				println!();
-				stdin.lock().read_line(&mut expression).expect("FOI");	
+				stdin.lock().read_line(&mut expression).expect("Não foi possível ler a expressão.");	
 		 }
     
 }
