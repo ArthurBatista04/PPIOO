@@ -3,41 +3,49 @@ use std::io::{self, BufRead};
 use std::convert::AsRef;
 
 #[derive(Debug,PartialEq,Clone)]
+//Estrutura de nó para a árvore de expressões
 struct node {
 	key: String,
 	left : Option<Box<node>>,
 	right : Option<Box<node>>,
 }
 
-
+//A função lexer transforma a expressão de entrada em um vetor de tokens
 fn lexer(expression: &String) -> VecDeque<String>{
 	let mut expression_token: VecDeque<String> = VecDeque::new();
 	let mut aux: Vec<char> = Vec::new();
-	let special_characters = vec!['*','/','+','-','(',')'];
+	let special_characters = vec!['*','/','+','-','(',')']; //caracteres especiais
 	let special_characters_verificate = vec!['*','/','+','-','('];
 	let mut count = 0;
 
-	for element in expression.chars() { //retira os espaços da string expression separando cada elemento em uma posição do vetor
+	//retira os espaços da string de expressão,
+	//colocando cada elemento (números e caracteres especiais) em uma posição do vetor
+	for element in expression.chars() { 
 		if element.is_digit(10) || special_characters.contains(&element) {
 			aux.push(element);    
 		}
 	}
 
-	if aux[count] == '-'{ //tratamento para o caso de começar com um número negativo
+	//tratamento para o caso de a expressão começar com um número negativo
+	if aux[count] == '-'{ 
 		let mut negative_number: String = "-".to_string();
 		count = count + 1;
-		while aux[count].is_digit(10) { // enquanto tiver algarismos
+		// enquanto tiver algarismos, constrói o número negativo
+		while aux[count].is_digit(10) { 
 			negative_number.push(aux[count]);
 			count = count + 1;
 			if count == aux.len() {
 				break;
 			}
 		}
+		//adiciona ao vetor de tokens o número negativo inicial
 		expression_token.push_back(negative_number);
 	}
 
-	while count < aux.len() { // junção dos alagrismos
-		let mut num: String = "".to_string(); 
+	//constrói o restante do vetor de tokens
+	while count < aux.len() { 
+		let mut num: String = "".to_string();
+		//forma os valores numéricos
 		while aux[count].is_digit(10) {
 			num.push(aux[count]);
 			count = count + 1;
@@ -45,21 +53,26 @@ fn lexer(expression: &String) -> VecDeque<String>{
 				break;
 			}
 		}
-		if num != "".to_string() { // se um número foi formado
+		
+		if num != "".to_string() { 
 			expression_token.push_back(num);
 		}else{
-			if aux[count] == '-' && aux[count + 1].is_digit(10) && special_characters_verificate.contains(&aux[count-1]) { //tratamento dos números negativos
+			//tratamento dos números negativos
+			if aux[count] == '-' && aux[count + 1].is_digit(10) && special_characters_verificate.contains(&aux[count-1]) { 
 				let mut negative_number: String = "-".to_string();
 				count = count + 1;
-				while aux[count].is_digit(10) { // enquanto tiver alagrismos
+				//forma os valores numéricos negativos
+				while aux[count].is_digit(10) { 
 					negative_number.push(aux[count]);
 					count = count + 1;
 					if count == aux.len() {
 						break;
 					}
 				}
+				//se um número foi formado, adiciona no vetor
 				expression_token.push_back(negative_number);
-			}else{ // caso seja um caracter especial
+			// caso seja um caracter especial, adiciona no vetor
+			}else{ 
 				expression_token.push_back(aux[count].to_string());
 				count = count + 1;
 			}
@@ -68,31 +81,43 @@ fn lexer(expression: &String) -> VecDeque<String>{
 	return expression_token
 }   
 
+//esta função verifica a precedência de operadores
 fn greater_or_equal_precedence(operator1: &String, operator2: &String, operators: &Vec<String>) -> bool {
-	if !operators.contains(&operator2) { // se o topo da pilha for '(' ou ')' 
+	//retorna falso se o topo da pilha for '('
+	if !operators.contains(&operator2) { 
 		return false
-	} else if operator2 == &'/'.to_string() || operator2 == &'*'.to_string() { // se o topo da pilha tiver maior precedência
+	//retorna verdadeiro se o topo da pilha tiver maior precedência
+	} else if operator2 == &'/'.to_string() || operator2 == &'*'.to_string() { 
 		return true 
-	} else if operator1 == &'/'.to_string() || operator1 == &'*'.to_string() { // se o elemento da fila tiver maior precedência
+	//retorna flaso se o elemento da fila tiver maior precedência
+	} else if operator1 == &'/'.to_string() || operator1 == &'*'.to_string() { 
 		return false
-	} 
-	return true // se ambos tiverem mesma precedência
+	}
+	//retorna verdadeiro se ambos tiverem a mesma precedência
+	return true 
 }
 
+//esta função transforma o vetor de tokens em um vetor com a reverse polish notation
 fn parser(tokens: &mut VecDeque<String>) -> VecDeque<String> {
-	let mut stack: VecDeque<String> = VecDeque::new();
-	let mut queue: VecDeque<String> = VecDeque::new();
+	let mut stack: VecDeque<String> = VecDeque::new(); //pilha de operadores
+	let mut queue: VecDeque<String> = VecDeque::new(); //fila de saída
 	let operators = vec![String::from("*"),String::from("/"),String::from("+"),String::from("-")]; // contém os operadores
 	let mut element: String;
-	while !tokens.is_empty() { // enquanto tiver elementos dentro de tokens
-		element = tokens.pop_front().unwrap(); // pegue o valor do elemento no inicio da fila
-		if element.parse::<f64>().is_ok() { // verfica-se se o valor é um numero
+	//percorre todo o vetor de tokens
+	while !tokens.is_empty() { 
+		//primeiro elemento do vetor de tokens
+		element = tokens.pop_front().unwrap();
+		//se o primeiro elemento é um número, adiciona na fila de saída
+		if element.parse::<i64>().is_ok() { 
 			queue.push_back(element);
-		} else if operators.contains(&element) { // se o elemento for um operator
-				while !stack.is_empty() { // enquanto haver elementos no topo da pilha com maior pecedência
+		//se o elemento for um operator, verifica as precedências
+		}else if operators.contains(&element) {
+				//enquanto houver elementos no topo da pilha, verifica pecedência
+				while !stack.is_empty() { 
 					let top_of_stack = &stack[stack.len()-1];
+					//se o elemento do topo da tiver maior precedência, adiciona-o na fila de saída
 					if greater_or_equal_precedence(&element, &top_of_stack, &operators) {
-						queue.push_back(stack.pop_back().unwrap()); // adicionamos o elemento do topo da pilha ao final da fila
+						queue.push_back(stack.pop_back().unwrap()); 
 					} else {
 						break;
 					}
