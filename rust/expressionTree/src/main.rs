@@ -165,7 +165,7 @@ fn create_tree(rpn: &mut VecDeque<String>) -> node{
 }
 
 //percorre recursivamente a arvore e imprime na tela a expressão
-fn to_string(root: &node) {
+fn to_string(root: &node) -> String{
 	let maior_precedencia = vec![String::from("*"),String::from("/")];
 	let menor_precedencia = vec![String::from("+"),String::from("-")];
     match root {
@@ -174,7 +174,10 @@ fn to_string(root: &node) {
             right: None,
             ..
         } => {
-			print!("{}",root.key);
+			let mut aux = String::new();
+			aux.push_str(&root.key);
+			return aux;
+			//print!("{}",root.key);
         }
         node {
             left: Some(left),
@@ -182,32 +185,42 @@ fn to_string(root: &node) {
             ..
         } => {
 			if maior_precedencia.contains(&root.key) && menor_precedencia.contains(&Some(left).unwrap().key) && menor_precedencia.contains(&Some(right).unwrap().key){
-				print!("(");
-				to_string(&left);
-				print!(")");
-				print!(" {} ", root.key);
-				print!("(");
-				to_string(&right);
-				print!(")");
+				let mut aux = String::new();
+				aux.push('(');
+				aux.push_str(&to_string(&left));
+				aux.push(')');
+				aux.push_str(&root.key);
+				aux.push('(');
+				aux.push_str(&to_string(&right));
+				aux.push(')');
+				return aux;
 			} else if maior_precedencia.contains(&root.key) && menor_precedencia.contains(&Some(left).unwrap().key){
-				print!("(");
-				to_string(&left);
-				print!(")");
-				print!(" {} ", root.key);
-				to_string(&right);
+				let mut aux = String::new();
+				aux.push('(');
+				aux.push_str(&to_string(&left));
+				aux.push(')');
+				aux.push_str(&root.key);
+				aux.push_str(&to_string(&right));
+				return aux;
 			} else if maior_precedencia.contains(&root.key) && menor_precedencia.contains(&Some(right).unwrap().key){
-				to_string(&left);
-				print!(" {} ", root.key);
-				print!("(");
-				to_string(&right);
-				print!(")");
+				let mut aux = String::new();
+				aux.push_str(&to_string(&left));
+				aux.push_str(&root.key);
+				aux.push('(');
+				aux.push_str(&to_string(&right));
+				aux.push(')');
+				return aux;
 			} else {
-				to_string(&left);
-				print!(" {} ", root.key);
-				to_string(&right);
+				let mut aux = String::new();
+				aux.push_str(&to_string(&left));
+				aux.push_str(&root.key);
+				aux.push_str(&to_string(&right));
+				return aux;
 			}
         }
-		_ => {}
+		_ => {
+			return String::from("");
+		}
     }
 }
 
@@ -242,7 +255,7 @@ fn eval_step(root: &mut node) {
 fn resolve_expression( root: &mut node){
 	//se o filho da esquerda e direita fore none, significa que todas as operações foram realizadas 
 	while root.right != None && root.left != None {
-		to_string(&root);
+		print!("{}",to_string(&root));
 		println!();
 		eval_step(root);
 	}
