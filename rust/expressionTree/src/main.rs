@@ -164,7 +164,7 @@ fn create_tree(rpn: &mut VecDeque<String>) -> node{
 	stack.pop_back().unwrap()
 }
 
-//percorre recursivamente a arvore e imprime na tela a expressão
+//percorre recursivamente a arvore e retorna uma String contendo a expressão
 fn to_string(root: &node) -> String{
 	let maior_precedencia = vec![String::from("*"),String::from("/")];
 	let menor_precedencia = vec![String::from("+"),String::from("-")];
@@ -175,9 +175,8 @@ fn to_string(root: &node) -> String{
             ..
         } => {
 			let mut aux = String::new();
-			aux.push_str(&root.key);
+			aux = aux + &root.key;
 			return aux;
-			//print!("{}",root.key);
         }
         node {
             left: Some(left),
@@ -186,35 +185,19 @@ fn to_string(root: &node) -> String{
         } => {
 			if maior_precedencia.contains(&root.key) && menor_precedencia.contains(&Some(left).unwrap().key) && menor_precedencia.contains(&Some(right).unwrap().key){
 				let mut aux = String::new();
-				aux.push('(');
-				aux.push_str(&to_string(&left));
-				aux.push(')');
-				aux.push_str(&root.key);
-				aux.push('(');
-				aux.push_str(&to_string(&right));
-				aux.push(')');
+				aux = aux + "(" + &to_string(&left) + ")" + " " + &root.key + " " + "(" + &to_string(&right) + ")";
 				return aux;
 			} else if maior_precedencia.contains(&root.key) && menor_precedencia.contains(&Some(left).unwrap().key){
 				let mut aux = String::new();
-				aux.push('(');
-				aux.push_str(&to_string(&left));
-				aux.push(')');
-				aux.push_str(&root.key);
-				aux.push_str(&to_string(&right));
+				aux = aux + "(" + &to_string(&left) + ")" + " " + &root.key + " " + &to_string(&right);
 				return aux;
 			} else if maior_precedencia.contains(&root.key) && menor_precedencia.contains(&Some(right).unwrap().key){
 				let mut aux = String::new();
-				aux.push_str(&to_string(&left));
-				aux.push_str(&root.key);
-				aux.push('(');
-				aux.push_str(&to_string(&right));
-				aux.push(')');
+				aux = aux + &to_string(&left) + " " + &root.key + " " + "(" + &to_string(&right) + ")";
 				return aux;
 			} else {
 				let mut aux = String::new();
-				aux.push_str(&to_string(&left));
-				aux.push_str(&root.key);
-				aux.push_str(&to_string(&right));
+				aux = aux + &to_string(&left) + " " + &root.key + " " + &to_string(&right);
 				return aux;
 			}
         }
