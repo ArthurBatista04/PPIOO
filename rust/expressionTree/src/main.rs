@@ -168,15 +168,13 @@ fn create_tree(rpn: &mut VecDeque<String>) -> node{
 fn to_string(root: &node) -> String{
 	let maior_precedencia = vec![String::from("*"),String::from("/")];
 	let menor_precedencia = vec![String::from("+"),String::from("-")];
-	let mut aux = String::new();
     match root {
         node {
             left: None,
             right: None,
             ..
         } => {
-			aux = aux + &root.key;
-			return aux;
+			return root.key.clone();
         }
         node {
             left: Some(left),
@@ -184,17 +182,13 @@ fn to_string(root: &node) -> String{
             ..
         } => {
 			if maior_precedencia.contains(&root.key) && menor_precedencia.contains(&Some(left).unwrap().key) && menor_precedencia.contains(&Some(right).unwrap().key){
-				aux = aux + "(" + &to_string(&left) + ")" + " " + &root.key + " " + "(" + &to_string(&right) + ")";
-				return aux;
+				return String::from("(") + &to_string(&left) + ")" + " " + &root.key + " " + "(" + &to_string(&right) + ")";
 			} else if maior_precedencia.contains(&root.key) && menor_precedencia.contains(&Some(left).unwrap().key){
-				aux = aux + "(" + &to_string(&left) + ")" + " " + &root.key + " " + &to_string(&right);
-				return aux;
+				return String::from("(") + &to_string(&left) + ")" + " " + &root.key + " " + &to_string(&right);
 			} else if maior_precedencia.contains(&root.key) && menor_precedencia.contains(&Some(right).unwrap().key){
-				aux = aux + &to_string(&left) + " " + &root.key + " " + "(" + &to_string(&right) + ")";
-				return aux;
+				return to_string(&left) + " " + &root.key + " " + "(" + &to_string(&right) + ")";
 			} else {
-				aux = aux + &to_string(&left) + " " + &root.key + " " + &to_string(&right);
-				return aux;
+				return to_string(&left) + " " + &root.key + " " + &to_string(&right);
 			}
         }
 		_ => {
