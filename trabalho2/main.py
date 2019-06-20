@@ -48,23 +48,17 @@ os.system("clear")
 
 order = [[] for i in range(quantalgoritmos)]
 graph = [[] for i in range(quantalgoritmos)]
-algortime = [0 for i in range(quantalgoritmos)]
+algortime = [[] for i in range(quantalgoritmos)]
 
 notOrdered = random.sample(range(1,11), 10)
 
 for op in range(len(options)):
 	if options[op] == 0:
-		start = time.time()
-		bubbleSort(notOrdered.copy(), order[options[op]])
-		algortime[options[op]] = (time.time() - start)
+		bubbleSort(notOrdered.copy(), order[options[op]],algortime[options[op]])
 	elif options[op] == 1:
-		start = time.time()
-		selectionSort(notOrdered.copy(), order[options[op]])
-		algortime[options[op]] = (time.time() - start)
+		selectionSort(notOrdered.copy(), order[options[op]],algortime[options[op]])
 	elif options[op] == 2:
-		start = time.time()
-		quickSort(notOrdered.copy(),0,len(notOrdered)-1, order[options[op]])
-		algortime[options[op]] = (time.time() - start)
+		quickSort(notOrdered.copy(),0,len(notOrdered)-1, order[options[op]],algortime[options[op]])
 
 max = 0
 values = {}
@@ -73,8 +67,6 @@ for i in options:
 	values[i] = len(order[i])
 	if len(order[i]) > max:
 		max = len(order[i])
-
-
 
 
 if ops == 1:
@@ -87,12 +79,12 @@ if ops == 1:
 
 				if i < values[op]:
 						print("Quantidade de trocas: ",i)
-						print("Tempo total de execução(s):", algortime[op])
+						print("Tempo total de execução(s):", algortime[op][i])
 						graph[op] = inicialize(notOrdered.copy())
 						alterGraph(graph[op], order[op][i])	
 				else:
 					print("Quantidade de trocas: ",values[op])
-					print("Tempo total de execução(s):", algortime[op])
+					print("Tempo total de execução(s):", algortime[op][values[op]-1])
 				printInstance(graph[op])
 		time.sleep(1)
 		os.system("clear")		
@@ -111,11 +103,11 @@ if ops == 2:
 					
 					if i < values[op]:
 						print("Quantidade de trocas: ",i)
-						print("Tempo total de execução(s):", algortime[op])
+						print("Tempo total de execução(s):", algortime[op][i])
 						graph[op] = inicialize(notOrdered.copy())
 						alterGraph(graph[op], order[op][i])	
 					else:
-						print("Tempo total de execução(s):", algortime[op])
+						print("Tempo total de execução(s):", algortime[op][values[op]-1])
 						print("Quantidade de trocas: ",values[op])
 					printInstance(graph[op])	
 
