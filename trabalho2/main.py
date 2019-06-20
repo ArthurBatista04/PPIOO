@@ -48,16 +48,23 @@ os.system("clear")
 
 order = [[] for i in range(quantalgoritmos)]
 graph = [[] for i in range(quantalgoritmos)]
+algortime = [0 for i in range(quantalgoritmos)]
 
 notOrdered = random.sample(range(1,11), 10)
 
 for op in range(len(options)):
 	if options[op] == 0:
+		start = time.time()
 		bubbleSort(notOrdered.copy(), order[options[op]])
+		algortime[options[op]] = (time.time() - start)
 	elif options[op] == 1:
+		start = time.time()
 		selectionSort(notOrdered.copy(), order[options[op]])
+		algortime[options[op]] = (time.time() - start)
 	elif options[op] == 2:
+		start = time.time()
 		quickSort(notOrdered.copy(),0,len(notOrdered)-1, order[options[op]])
+		algortime[options[op]] = (time.time() - start)
 
 max = 0
 values = {}
@@ -77,9 +84,15 @@ if ops == 1:
 				if op == 0:print("BUBBLE SORT\n")
 				elif op == 1:print("SELECTION SORT\n")
 				else:print("QUICK SORT\n")
+
 				if i < values[op]:
-					graph[op] = inicialize(notOrdered.copy())
-					alterGraph(graph[op], order[op][i])	
+						print("Quantidade de trocas: ",i)
+						print("Tempo total de execução(s):", algortime[op])
+						graph[op] = inicialize(notOrdered.copy())
+						alterGraph(graph[op], order[op][i])	
+				else:
+					print("Quantidade de trocas: ",values[op])
+					print("Tempo total de execução(s):", algortime[op])
 				printInstance(graph[op])
 		time.sleep(1)
 		os.system("clear")		
@@ -95,10 +108,17 @@ if ops == 2:
 					if op == 0:print("BUBBLE SORT\n")
 					elif op == 1:print("SELECTION SORT\n")
 					else:print("QUICK SORT\n")
+					
 					if i < values[op]:
+						print("Quantidade de trocas: ",i)
+						print("Tempo total de execução(s):", algortime[op])
 						graph[op] = inicialize(notOrdered.copy())
 						alterGraph(graph[op], order[op][i])	
-					printInstance(graph[op])
+					else:
+						print("Tempo total de execução(s):", algortime[op])
+						print("Quantidade de trocas: ",values[op])
+					printInstance(graph[op])	
+
 			Input = input("Digite enter para continuar ou 0 para sair:")
 			if not Input:
 				os.system("clear")	
