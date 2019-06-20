@@ -76,9 +76,8 @@ if ops == 1:
 				if op == 0:print("BUBBLE SORT\n")
 				elif op == 1:print("SELECTION SORT\n")
 				else:print("QUICK SORT\n")
-
 				if i < values[op]:
-						print("Quantidade de trocas: ",i)
+						print("Quantidade de trocas: ",i+1)
 						print("Tempo total de execução(s):", algortime[op][i])
 						graph[op] = inicialize(notOrdered.copy())
 						alterGraph(graph[op], order[op][i])	
@@ -102,7 +101,7 @@ if ops == 2:
 					else:print("QUICK SORT\n")
 					
 					if i < values[op]:
-						print("Quantidade de trocas: ",i)
+						print("Quantidade de trocas: ",i+1)
 						print("Tempo total de execução(s):", algortime[op][i])
 						graph[op] = inicialize(notOrdered.copy())
 						alterGraph(graph[op], order[op][i])	
