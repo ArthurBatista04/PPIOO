@@ -50,7 +50,7 @@ order = [[] for i in range(quantalgoritmos)]
 graph = [[] for i in range(quantalgoritmos)]
 algortime = [[] for i in range(quantalgoritmos)]
 
-notOrdered = random.sample(range(1,10001), 10000)
+notOrdered = random.sample(range(1,11), 10)
 
 for op in range(len(options)):
 	if options[op] == 0:
