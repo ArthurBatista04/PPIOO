@@ -1,6 +1,7 @@
 import time
-def selectionSort(A, order,algotime):
+def selectionSort(A):
 	start = time.time()
+	count = 0
 	for i in range(len(A)):
 		min_idx = i
 		swap = False
@@ -10,5 +11,6 @@ def selectionSort(A, order,algotime):
 				swap = True
 		A[i], A[min_idx] = A[min_idx], A[i]
 		if swap:
-			order.append(A.copy())
-			algotime.append(time.time() - start)
+			count = count + 1
+			yield [A.copy(),time.time() - start, False,count]
+	yield [A.copy(),time.time() - start, True,count]
